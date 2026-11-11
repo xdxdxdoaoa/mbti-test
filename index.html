@@ -1,0 +1,1208 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#faf7f5">
+  <meta name="description" content="Тест MBTI по восьми когнитивным функциям. 50 утверждений и результаты по моделям Myers и Grant/Brownsword.">
+  <title>Тест личности по MBTI</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #faf7f5;
+      --white: #fffdfb;
+      --ink: #2b1c23;
+      --muted: #6d5761;
+      --accent: #8b2a52;
+      --accent-dark: #6c1d3d;
+      --rose: #df9ab1;
+      --pink: #f7e5eb;
+      --track: #f0dce4;
+      --line: #e9dce0;
+      --body-font: Inter, "Segoe UI", Arial, sans-serif;
+      --display-font: "PT Serif", Georgia, serif;
+      --radius: 24px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body {
+      min-width: 0;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--page);
+      color: var(--ink);
+      font: 16px/1.55 var(--body-font);
+    }
+    main { flex: 1 0 auto; }
+    h1, h2, h3, p, ul, ol { margin: 0; }
+    h1, h2 { font-family: var(--display-font); font-weight: 400; }
+    h3 { font-size: 1rem; }
+    button, textarea { font: inherit; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+    [tabindex="-1"]:focus { outline: none; }
+
+    .wrap { width: min(1120px, calc(100% - 64px)); margin-inline: auto; }
+    .header { border-bottom: 1px solid var(--line); }
+    .header-inner {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      padding: 0;
+      border: 0;
+      border-radius: 9px;
+      color: var(--ink);
+      background: transparent;
+      font-weight: 700;
+      letter-spacing: .035em;
+    }
+    .brand:hover { color: var(--accent); }
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 2px;
+      padding: 5px;
+      border-radius: 9px;
+      background: var(--accent);
+    }
+    .brand-mark i { border-radius: 6px 6px 2px 6px; background: #ffe2ec; }
+    .brand-mark i:nth-child(2) { transform: rotate(90deg); opacity: .75; }
+    .brand-mark i:nth-child(3) { transform: rotate(-90deg); opacity: .75; }
+    .brand-mark i:nth-child(4) { transform: rotate(180deg); opacity: .5; }
+
+    .button, .text-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 46px;
+      border: 1px solid transparent;
+      font-size: .92rem;
+      font-weight: 650;
+    }
+    .button {
+      padding: 11px 20px;
+      border-radius: 10px;
+      color: #fff;
+      background: var(--accent);
+      transition: background-color .16s, border-color .16s;
+    }
+    .button:hover { background: var(--accent-dark); }
+    .button.secondary { color: var(--accent); background: var(--white); border-color: #d8b6c4; }
+    .button.secondary:hover { background: var(--pink); }
+    .text-button { padding: 5px 0; color: var(--accent); background: transparent; }
+    .text-button:hover:not(:disabled) { text-decoration: underline; text-underline-offset: 4px; }
+    .text-button:disabled { color: #78666d; opacity: .7; cursor: default; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr .88fr;
+      gap: clamp(28px, 6vw, 78px);
+      align-items: center;
+      padding-block: clamp(38px, 6.2vw, 86px) clamp(34px, 5vw, 64px);
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      margin-bottom: 19px;
+      color: var(--accent);
+      font-size: .88rem;
+      font-weight: 650;
+    }
+    .hero-meta i { width: 4px; height: 4px; border-radius: 50%; background: var(--rose); }
+    .hero h1 { font-size: clamp(3.15rem, 6.1vw, 5.45rem); line-height: 1.02; letter-spacing: -.055em; }
+    .hero h1 em { color: var(--accent); font-weight: 400; }
+    .hero-lead { max-width: 46ch; margin-top: 22px; color: var(--muted); font-size: clamp(1rem, 1.6vw, 1.16rem); }
+    .hero .button { min-height: 54px; margin-top: 28px; padding-inline: 23px; }
+    .button-arrow { font-size: 1.25em; line-height: 1; }
+
+    .function-map {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      padding: clamp(23px, 3vw, 38px);
+      border: 1px solid #eed3dc;
+      border-radius: 30px;
+      background: radial-gradient(ellipse at 82% 4%, #fbeef2 0, transparent 52%), linear-gradient(145deg, #f5e4e9, #efcbd8);
+    }
+    .function-map::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      top: 56%;
+      left: 50%;
+      width: 55%;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      border: 1px solid #ba628443;
+      border-radius: 50%;
+      box-shadow: 0 0 0 28px #ba628415, 0 0 0 29px #ba628430, 0 0 0 58px #ba62840e, 0 0 0 59px #ba628429;
+    }
+    .function-map h2 { margin-bottom: 19px; color: #63213c; font: 650 .93rem/1.5 var(--body-font); }
+    .map-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+    .map-cell {
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+      padding: 13px clamp(12px, 2.2vw, 24px);
+      border: 1px solid #fff9;
+      border-radius: 15px;
+      background: #fff9;
+    }
+    .map-symbol { color: #782346; font: 400 clamp(1.65rem, 3vw, 2.55rem)/1.2 var(--display-font); letter-spacing: -.045em; white-space: nowrap; }
+    .map-symbol i { margin-inline: 2px; color: #aa5b77; font-style: normal; font-size: .65em; }
+    .map-label { color: #674555; font-size: .84rem; }
+
+    .instructions { padding-bottom: clamp(38px, 5vw, 64px); }
+    .instructions h2 { margin-bottom: 17px; font-size: clamp(1.55rem, 3vw, 2rem); letter-spacing: -.025em; }
+    .guide {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      padding: 22px 0;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--white);
+    }
+    .guide > div { padding: 2px clamp(18px, 2.5vw, 30px); }
+    .guide > div + div { border-left: 1px solid var(--line); }
+    .guide p { margin-top: 6px; color: var(--muted); font-size: .91rem; }
+    .footer { border-top: 1px solid var(--line); }
+    .footer .wrap { padding-block: 18px; color: var(--muted); font-size: .85rem; }
+
+    .quiz { width: min(720px, calc(100% - 64px)); margin-inline: auto; padding-block: clamp(24px, 5vw, 57px); }
+    .progress-meta { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 9px; color: var(--accent); font-weight: 650; font-size: .92rem; }
+    .progress-track, .bar { overflow: hidden; border-radius: 999px; background: var(--track); }
+    .progress-track { height: 8px; margin-bottom: 22px; }
+    .progress-track span, .bar span { display: block; width: var(--value, 0%); height: 100%; border-radius: inherit; background: var(--accent); }
+    .progress-track span { transition: width .18s ease; }
+    .panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--white); }
+    .quiz-card { padding: clamp(18px, 4.2vw, 34px); }
+    .question { font: 400 clamp(1.45rem, 3.5vw, 2rem)/1.26 var(--display-font); letter-spacing: -.018em; }
+    .example { margin-top: 12px; padding-left: 12px; border-left: 2px solid var(--rose); color: var(--muted); font-size: .91rem; }
+    .options { display: grid; gap: 8px; margin-top: 23px; }
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 51px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: var(--ink);
+      background: var(--white);
+      text-align: left;
+      transition: border-color .14s, background-color .14s;
+      touch-action: manipulation;
+    }
+    .option:hover { border-color: #ce9cb1; background: #fff5f8; }
+    .option[aria-pressed="true"] { border-color: var(--accent); background: var(--pink); }
+    .option-number {
+      flex: 0 0 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: var(--accent);
+      background: var(--pink);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .option[aria-pressed="true"] .option-number { color: #fff; background: var(--accent); }
+    .quiz-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
+    .key-hint { color: var(--muted); font-size: .81rem; }
+
+    .results { width: min(860px, calc(100% - 64px)); margin-inline: auto; padding-block: clamp(27px, 5vw, 57px); }
+    .result-heading { margin-bottom: 20px; font-size: clamp(2rem, 4.7vw, 3.25rem); line-height: 1.08; letter-spacing: -.035em; }
+    .demo-note { margin: -8px 0 20px; color: var(--accent); font-size: .9rem; }
+    .result-panel { padding: clamp(18px, 3.7vw, 34px); margin-bottom: 16px; }
+    .result-panel h2 { font-size: clamp(1.34rem, 2.8vw, 1.8rem); line-height: 1.25; letter-spacing: -.018em; }
+    .algorithm { display: block; margin-bottom: 4px; color: var(--accent); font: 650 .85rem/1.4 var(--body-font); letter-spacing: normal; }
+    .type-identity {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 22px;
+      margin-block: 19px 22px;
+      padding: 18px 22px;
+      border: 1px solid #f0d6df;
+      border-radius: 16px;
+      background: linear-gradient(125deg, #f8e8ee, #fcf3f6);
+    }
+    .type-code { color: var(--accent); font: 400 clamp(2.9rem, 7.5vw, 4.65rem)/1 var(--display-font); letter-spacing: -.055em; }
+    .type-name { color: #54223a; font-size: 1.08rem; font-weight: 700; }
+    .stack { color: var(--muted); font-size: .81rem; white-space: nowrap; }
+    .axes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 25px; }
+    .axis-values { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 6px; color: var(--muted); font-size: .94rem; font-variant-numeric: tabular-nums; }
+    .axis-values strong { color: var(--accent); }
+    .bar { height: 8px; }
+    .axis-bar { background: var(--rose); }
+    .axis-bar span { border-radius: 999px 0 0 999px; }
+    .axis-note { margin-top: 4px; color: var(--muted); font-size: .79rem; }
+    .description { margin-top: 21px; padding-top: 13px; border-top: 1px solid var(--line); }
+    .description summary { color: var(--accent); font-weight: 650; font-size: .92rem; cursor: pointer; }
+    .description p { margin-top: 9px; color: var(--muted); font-size: .95rem; }
+    .grant-list, .function-list { list-style: none; padding: 0; margin-top: 16px; }
+    .grant-list { display: grid; gap: 10px; }
+    .grant-row {
+      display: grid;
+      grid-template-columns: 28px minmax(86px, .5fr) 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+    .grant-row:first-child { background: #fff5f8; border-color: #efd4df; }
+    .rank { color: var(--muted); font-size: .85rem; text-align: center; }
+    .grant-type { display: block; color: var(--accent); font-weight: 750; line-height: 1.2; }
+    .pct { color: var(--accent); font-weight: 700; font-size: .92rem; text-align: right; font-variant-numeric: tabular-nums; }
+    .result-note { margin-top: 12px; color: var(--muted); font-size: .85rem; }
+    .function-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 25px; }
+    .function-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+    .function-head b { margin-right: 5px; color: var(--accent); }
+    .function-head span:first-child { color: var(--muted); font-size: .88rem; }
+    .quality { margin-block: 16px; padding: 15px 18px; border: 1px solid #ecd5be; border-radius: 14px; color: #614c37; background: #fff8ef; font-size: .88rem; }
+    .quality ul { margin-top: 4px; padding-left: 19px; }
+    .result-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 23px; }
+    .copy-status { color: var(--accent); font-size: .88rem; }
+    .copy-fallback { width: 100%; min-height: 150px; margin-top: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: var(--white); resize: vertical; }
+
+    @media (max-width: 760px) {
+      .wrap, .quiz, .results { width: calc(100% - 36px); }
+      .header-inner { min-height: 62px; }
+      .hero { grid-template-columns: 1fr; gap: 26px; }
+      .hero h1 { font-size: clamp(3rem, 10vw, 4.6rem); }
+      .hero-lead { margin-top: 15px; }
+      .hero .button { margin-top: 20px; }
+      .function-map { padding: 18px; border-radius: 22px; }
+      .function-map h2 { margin-bottom: 12px; }
+      .map-cell { min-height: 80px; }
+    }
+    @media (max-width: 560px) {
+      .guide { grid-template-columns: 1fr; padding: 0 17px; }
+      .guide > div { padding: 14px 0; }
+      .guide > div + div { border-top: 1px solid var(--line); border-left: 0; }
+      .axes, .function-list { grid-template-columns: 1fr; }
+      .grant-row { grid-template-columns: 16px 1fr auto; gap: 5px 9px; }
+      .grant-row .bar { grid-column: 2 / -1; grid-row: 2; }
+      .grant-row .pct { grid-column: 3; grid-row: 1; }
+    }
+    @media (pointer: coarse) { .key-hint { display: none; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="wrap header-inner">
+      <button type="button" class="brand" id="brand" aria-label="MBTI, на главную">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        MBTI
+      </button>
+      <button type="button" class="text-button" id="demo">Посмотреть демо <span aria-hidden="true">↗</span></button>
+      <button type="button" class="text-button" id="home" hidden><span aria-hidden="true">←</span> На главную</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap" id="intro" aria-labelledby="intro-title">
+      <div class="hero">
+        <div>
+          <p class="hero-meta"><span>50 утверждений</span><i aria-hidden="true"></i><span>7–10 минут</span></p>
+          <h1 id="intro-title" tabindex="-1">Тест личности<br>по <em>MBTI</em></h1>
+          <p class="hero-lead">Узнайте свой тип по модели Myers, три ближайших типа по Grant/Brownsword и выраженность восьми когнитивных функций.</p>
+          <button type="button" class="button" id="start">Начать тест <span class="button-arrow" aria-hidden="true">→</span></button>
+        </div>
+        <div class="function-map">
+          <h2>Когнитивные функции</h2>
+          <div class="map-grid">
+            <div class="map-cell"><span class="map-symbol">Te <i>/</i> Ti</span><span class="map-label">Логика</span></div>
+            <div class="map-cell"><span class="map-symbol">Fe <i>/</i> Fi</span><span class="map-label">Этика</span></div>
+            <div class="map-cell"><span class="map-symbol">Se <i>/</i> Si</span><span class="map-label">Сенсорика</span></div>
+            <div class="map-cell"><span class="map-symbol">Ne <i>/</i> Ni</span><span class="map-label">Интуиция</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="instructions">
+        <h2>Как проходить</h2>
+        <div class="guide">
+          <div><h3>Оцените каждое утверждение</h3><p>Выберите от 1 «Совсем не про меня» до 5 «Точно про меня».</p></div>
+          <div><h3>Сверьтесь с примером</h3><p>Под некоторыми утверждениями есть пример, который помогает понять их смысл.</p></div>
+          <div><h3>Меняйте ответы при необходимости</h3><p>Кнопка «Назад» возвращает к предыдущему вопросу. Для ответа также подойдут клавиши 1–5.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="quiz" id="quiz" aria-labelledby="question" hidden>
+      <div class="progress-meta"><span id="question-count"></span><span id="progress-value" aria-hidden="true"></span></div>
+      <div class="progress-track" id="progress" role="progressbar" aria-label="Отвечено" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><span></span></div>
+      <div class="panel quiz-card">
+        <h1 class="question" id="question" tabindex="-1"></h1>
+        <p class="example" id="example" hidden></p>
+        <div class="options" id="options" role="group" aria-label="Варианты ответа"></div>
+        <div class="quiz-nav">
+          <button type="button" class="text-button" id="back"><span aria-hidden="true">←</span> Назад</button>
+          <span class="key-hint">Клавиши 1–5 для ответа</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="results" id="results" aria-labelledby="result-title" hidden>
+      <h1 class="result-heading" id="result-title" tabindex="-1">Результат теста</h1>
+      <p class="demo-note" id="demo-note" hidden>Демо со случайными ответами</p>
+
+      <section class="panel result-panel" aria-labelledby="myers-title">
+        <h2 id="myers-title"><span class="algorithm">Алгоритм 1</span> Myers</h2>
+        <div class="type-identity">
+          <strong class="type-code" id="type-code"></strong>
+          <div><p class="type-name" id="type-name"></p><p class="stack" id="type-stack"></p></div>
+        </div>
+        <div class="axes" id="myers-axes"></div>
+        <details class="description" id="type-description">
+          <summary>Описание типа</summary>
+          <p id="type-description-text"></p>
+        </details>
+      </section>
+
+      <section class="panel result-panel" aria-labelledby="grant-title">
+        <h2 id="grant-title"><span class="algorithm">Алгоритм 2</span> Grant/Brownsword</h2>
+        <ol class="grant-list" id="grant-list" aria-label="Три ближайших типа"></ol>
+        <p class="result-note">Процент показывает совпадение с профилем каждого типа. Оценки рассчитываются независимо.</p>
+      </section>
+
+      <section class="panel result-panel" aria-labelledby="functions-title">
+        <h2 id="functions-title">Выраженность когнитивных функций</h2>
+        <p class="result-note">0% соответствует ответу «Совсем не про меня» на все вопросы функции, 100% — «Точно про меня».</p>
+        <ul class="function-list" id="function-list"></ul>
+      </section>
+
+      <aside class="quality" id="quality" hidden>
+        <strong>Особенности ответов</strong>
+        <ul id="quality-list"></ul>
+      </aside>
+      <div class="result-actions">
+        <button type="button" class="button" id="result-home">На главную</button>
+        <button type="button" class="button secondary" id="copy">Скопировать результат</button>
+        <span class="copy-status" id="copy-status" role="status"></span>
+      </div>
+      <textarea class="copy-fallback" id="copy-fallback" aria-label="Текст результата для копирования" readonly hidden></textarea>
+    </section>
+
+    <noscript><p class="wrap">Для прохождения теста включите JavaScript в браузере.</p></noscript>
+  </main>
+
+  <footer class="footer"><div class="wrap">Ответы остаются в вашем браузере.</div></footer>
+
+  <script type="application/json" id="test-data">{
+  "scale": {
+    "1": "Совсем не про меня",
+    "2": "Скорее не про меня",
+    "3": "Бывает по-разному",
+    "4": "Скорее про меня",
+    "5": "Точно про меня"
+  },
+  "questions": [
+    {
+      "id": "Te1",
+      "function": "Te",
+      "question": "Выбирая что-то серьёзное, я не успокоюсь, пока не сравню варианты по цифрам и отзывам.",
+      "example": "Например: новый телефон, курс, врач."
+    },
+    {
+      "id": "Te2",
+      "function": "Te",
+      "question": "Мне лучше работается, когда заранее ясно, кто что делает и к какому сроку.",
+      "example": "Например: «ты делаешь до пятницы, я — до понедельника»."
+    },
+    {
+      "id": "Te3",
+      "function": "Te",
+      "question": "Если результат нельзя измерить, мне трудно понять, получилось у меня или нет.",
+      "example": "Сколько сделано, сколько сэкономлено, на сколько стало лучше."
+    },
+    {
+      "id": "Te4",
+      "function": "Te",
+      "question": "Если в моей работе или быту что-то устроено неудобно, я нахожу, как сделать это быстрее и проще.",
+      "example": "Например, меняю порядок действий, чтобы тратить меньше времени."
+    },
+    {
+      "id": "Te5",
+      "function": "Te",
+      "question": "Если в группе никто не руководит, я легко беру на себя распределение задач.",
+      "example": "Например, на совместном проекте или при организации поездки."
+    },
+    {
+      "id": "Te6",
+      "function": "Te",
+      "question": "Чужое мнение меня не убеждает, пока за ним нет фактов.",
+      "example": "«Мне так кажется» для меня не аргумент."
+    },
+    {
+      "id": "Ti1",
+      "function": "Ti",
+      "question": "Меня задевает, когда в чьих-то словах есть противоречие, а все делают вид, что не заметили.",
+      "example": "Например, человек сначала говорит одно, а через минуту — прямо противоположное."
+    },
+    {
+      "id": "Ti2",
+      "function": "Ti",
+      "question": "Прежде чем пользоваться новой вещью или методом, я хочу понять, как он устроен.",
+      "example": "Например, прочитать, как работает прибор, а не просто нажимать кнопки."
+    },
+    {
+      "id": "Ti3",
+      "function": "Ti",
+      "question": "Я люблю подбирать точные слова, чтобы мысль была выражена без искажений.",
+      "example": "Могу долго искать то самое слово или поправить собеседника, если он сказал неточно."
+    },
+    {
+      "id": "Ti4",
+      "function": "Ti",
+      "question": "Мне трудно принять правило или совет, если мне не объяснили логику.",
+      "example": "Ответ «потому что так надо» меня не устраивает."
+    },
+    {
+      "id": "Ti5",
+      "function": "Ti",
+      "question": "Услышав новую теорию, я мысленно проверяю её на слабые места.",
+      "example": "Например, думаю: «а если взять другой случай, это ещё будет работать?»"
+    },
+    {
+      "id": "Ti6",
+      "function": "Ti",
+      "question": "Мне нравится разбираться в сложной задаче ради интереса, даже если практической пользы от этого нет.",
+      "example": "Например, головоломки, логические игры, вопрос «почему это так устроено?»"
+    },
+    {
+      "id": "Fe1",
+      "function": "Fe",
+      "question": "Я замечаю, что у человека испортилось настроение, ещё до того, как он об этом скажет.",
+      "example": ""
+    },
+    {
+      "id": "Fe2",
+      "function": "Fe",
+      "question": "Когда в компании повисает напряжение, мне хочется его разрядить.",
+      "example": "Например, пошутить, сменить тему или предложить что-то сделать вместе."
+    },
+    {
+      "id": "Fe3",
+      "function": "Fe",
+      "question": "Я говорю по-разному с разными людьми, подстраиваясь под них.",
+      "example": "Например, с одним мягче, с другим проще, с третьим серьёзнее."
+    },
+    {
+      "id": "Fe4",
+      "function": "Fe",
+      "question": "Если близкий человек расстроен, я сразу стараюсь его поддержать или развеселить.",
+      "example": ""
+    },
+    {
+      "id": "Fe5",
+      "function": "Fe",
+      "question": "Мне важно, чтобы за столом или на встрече всем было комфортно и никто не чувствовал себя лишним.",
+      "example": ""
+    },
+    {
+      "id": "Fe6",
+      "function": "Fe",
+      "question": "Прежде чем сказать что-то резкое, я стараюсь представить, как это воспримут, и смягчаю формулировку.",
+      "example": ""
+    },
+    {
+      "id": "Fi1",
+      "function": "Fi",
+      "question": "Если на работе от меня потребуют делать то, что противоречит моим личным ценностям, я уйду, даже если уходить невыгодно.",
+      "example": "Например, рекламировать то, во что сам не верю."
+    },
+    {
+      "id": "Fi2",
+      "function": "Fi",
+      "question": "Мне тяжело изображать радость или интерес, когда на самом деле их нет.",
+      "example": "Даже из вежливости."
+    },
+    {
+      "id": "Fi3",
+      "function": "Fi",
+      "question": "В споре о том, что для меня по-настоящему важно, я могу проиграть по аргументам, но своего мнения не изменю.",
+      "example": ""
+    },
+    {
+      "id": "Fi4",
+      "function": "Fi",
+      "question": "Выбирая занятие, работу или друзей, я ориентируюсь на то, что мне лично по-настоящему близко.",
+      "example": "А не на то, что престижно или выгодно."
+    },
+    {
+      "id": "Fi5",
+      "function": "Fi",
+      "question": "Я быстро чувствую, когда человек говорит красивые слова, но сам в них не верит.",
+      "example": "Хвалит или обещает помочь, но чувствуется, что ему всё равно."
+    },
+    {
+      "id": "Fi6",
+      "function": "Fi",
+      "question": "Несправедливость задевает меня лично, даже если касается незнакомых людей.",
+      "example": "Например, когда читаю новость о том, как кого-то обидели."
+    },
+    {
+      "id": "Se1",
+      "function": "Se",
+      "question": "Войдя в комнату, я сразу замечаю, что в ней изменилось.",
+      "example": "Например, новую вещь, перестановку, незнакомый запах."
+    },
+    {
+      "id": "Se2",
+      "function": "Se",
+      "question": "Если что-то внезапно пошло не так, я быстро соображаю на месте и начинаю действовать.",
+      "example": "Например, что-то сломалось в дороге или сорвались планы."
+    },
+    {
+      "id": "Se3",
+      "function": "Se",
+      "question": "Мне нравятся физическая активность и сильные впечатления.",
+      "example": "Например, спорт, скорость, аттракционы, танцы."
+    },
+    {
+      "id": "Se4",
+      "function": "Se",
+      "question": "Я сильно ощущаю вкус еды, запахи, звуки, прикосновения и получаю от этого большое удовольствие.",
+      "example": ""
+    },
+    {
+      "id": "Se5",
+      "function": "Se",
+      "question": "Я лучше усваиваю новое, когда пробую делать это своими руками, а не читаю или слушаю объяснение.",
+      "example": ""
+    },
+    {
+      "id": "Se6",
+      "function": "Se",
+      "question": "Если друзья вдруг предлагают поехать куда-нибудь прямо сегодня, я с радостью соглашаюсь.",
+      "example": ""
+    },
+    {
+      "id": "Si1",
+      "function": "Si",
+      "question": "Я хорошо помню подробности прошлого.",
+      "example": "Например, кто что сказал, как выглядело место, какая была погода."
+    },
+    {
+      "id": "Si2",
+      "function": "Si",
+      "question": "Мне нравится возвращаться к знакомому.",
+      "example": "Например, в любимое кафе, на привычный маршрут, к любимому фильму."
+    },
+    {
+      "id": "Si3",
+      "function": "Si",
+      "question": "Пробуя что-то новое, я сразу прикидываю, лучше оно или хуже того, к чему я привык.",
+      "example": "«В прошлый раз было вкуснее»."
+    },
+    {
+      "id": "Si4",
+      "function": "Si",
+      "question": "Мне комфортнее, когда день идёт по привычному распорядку, и неприятно, когда его внезапно ломают.",
+      "example": ""
+    },
+    {
+      "id": "Si5",
+      "function": "Si",
+      "question": "Мне трудно расстаться с вещами, которые связаны с воспоминаниями.",
+      "example": "Например, подарки, старые фотографии, билеты, письма."
+    },
+    {
+      "id": "Si6",
+      "function": "Si",
+      "question": "Я не меняю способ, который меня не раз выручал, даже если слышу про новые.",
+      "example": "Как готовить, учить, добираться."
+    },
+    {
+      "id": "Ne1",
+      "function": "Ne",
+      "question": "Когда я думаю над проблемой, мне в голову сразу приходит много разных вариантов решения.",
+      "example": "Даже странных."
+    },
+    {
+      "id": "Ne2",
+      "function": "Ne",
+      "question": "В разговоре я часто перескакиваю с одной темы на другую, потому что одно напоминает мне о другом.",
+      "example": ""
+    },
+    {
+      "id": "Ne3",
+      "function": "Ne",
+      "question": "Меня легко увлекают новые идеи, и я часто берусь за несколько дел одновременно.",
+      "example": ""
+    },
+    {
+      "id": "Ne4",
+      "function": "Ne",
+      "question": "Я люблю придумывать «а что, если?» просто ради забавы.",
+      "example": "Например: «а что, если бы все люди могли читать мысли?»"
+    },
+    {
+      "id": "Ne5",
+      "function": "Ne",
+      "question": "Мне интересно пробовать разные способы сделать одно и то же, даже если привычный способ работает.",
+      "example": ""
+    },
+    {
+      "id": "Ne6",
+      "function": "Ne",
+      "question": "После фильма или книги я часто думаю, как всё могло бы сложиться иначе.",
+      "example": "«А если бы герой выбрал другую дорогу?»"
+    },
+    {
+      "id": "Ni1",
+      "function": "Ni",
+      "question": "Иногда я заранее чувствую, чем закончится ситуация, и потом это подтверждается.",
+      "example": ""
+    },
+    {
+      "id": "Ni2",
+      "function": "Ni",
+      "question": "Ответ на сложный вопрос иногда приходит ко мне внезапно, когда я думаю совсем о другом.",
+      "example": "Например, в душе, в дороге или перед сном."
+    },
+    {
+      "id": "Ni3",
+      "function": "Ni",
+      "question": "Принимая решения, я думаю о том, кем или где хочу быть через несколько лет.",
+      "example": "Например, выбирая работу, смотрю не на ближайшую зарплату, а на то, куда это меня приведёт."
+    },
+    {
+      "id": "Ni4",
+      "function": "Ni",
+      "question": "Мне бывает трудно объяснить, откуда я знаю, что это верно: я просто понимаю.",
+      "example": "Например, сразу чувствуешь, что договорённость сорвётся, хотя поводов нет."
+    },
+    {
+      "id": "Ni5",
+      "function": "Ni",
+      "question": "Сложные вещи мне проще понять через образ или сравнение.",
+      "example": "Например, представить идею как картинку или как историю."
+    },
+    {
+      "id": "Ni6",
+      "function": "Ni",
+      "question": "Мне проще сосредоточиться на одной идее и довести её до конца, чем распылять внимание на много вариантов.",
+      "example": ""
+    }
+  ],
+  "controlQuestions": [
+    {
+      "id": "K3",
+      "question": "Я никогда не раздражаюсь на близких людей."
+    },
+    {
+      "id": "K4",
+      "question": "Я всегда сразу признаю свою неправоту."
+    }
+  ],
+  "stacks": {
+    "ISTJ": [
+      "Si",
+      "Te",
+      "Fi",
+      "Ne"
+    ],
+    "ISFJ": [
+      "Si",
+      "Fe",
+      "Ti",
+      "Ne"
+    ],
+    "INFJ": [
+      "Ni",
+      "Fe",
+      "Ti",
+      "Se"
+    ],
+    "INTJ": [
+      "Ni",
+      "Te",
+      "Fi",
+      "Se"
+    ],
+    "ISTP": [
+      "Ti",
+      "Se",
+      "Ni",
+      "Fe"
+    ],
+    "ISFP": [
+      "Fi",
+      "Se",
+      "Ni",
+      "Te"
+    ],
+    "INFP": [
+      "Fi",
+      "Ne",
+      "Si",
+      "Te"
+    ],
+    "INTP": [
+      "Ti",
+      "Ne",
+      "Si",
+      "Fe"
+    ],
+    "ESTP": [
+      "Se",
+      "Ti",
+      "Fe",
+      "Ni"
+    ],
+    "ESFP": [
+      "Se",
+      "Fi",
+      "Te",
+      "Ni"
+    ],
+    "ENFP": [
+      "Ne",
+      "Fi",
+      "Te",
+      "Si"
+    ],
+    "ENFJ": [
+      "Fe",
+      "Ni",
+      "Se",
+      "Ti"
+    ],
+    "ENTP": [
+      "Ne",
+      "Ti",
+      "Fe",
+      "Si"
+    ],
+    "ENTJ": [
+      "Te",
+      "Ni",
+      "Se",
+      "Fi"
+    ],
+    "ESTJ": [
+      "Te",
+      "Si",
+      "Ne",
+      "Fi"
+    ],
+    "ESFJ": [
+      "Fe",
+      "Si",
+      "Ne",
+      "Ti"
+    ]
+  },
+  "functionNames": {
+    "Te": "Экстравертная логика (Te)",
+    "Ti": "Интровертная логика (Ti)",
+    "Fe": "Экстравертная этика (Fe)",
+    "Fi": "Интровертная этика (Fi)",
+    "Se": "Экстравертная сенсорика (Se)",
+    "Si": "Интровертная сенсорика (Si)",
+    "Ne": "Экстравертная интуиция (Ne)",
+    "Ni": "Интровертная интуиция (Ni)"
+  },
+  "grantWeights": [
+    4,
+    3,
+    0.5,
+    -2
+  ]
+}</script>
+  <script type="application/json" id="type-data">{
+  "ISTJ": [
+    "Инспектор",
+    "Надёжный, ответственный и обстоятельный. Опирается на факты, опыт и проверенные методы, держит слово и доводит дела до конца. Ценит порядок, традиции и ясные правила. Со стороны может казаться сдержанным и суховатым, но на таких людей можно положиться."
+  ],
+  "ISFJ": [
+    "Защитник",
+    "Заботливый, внимательный и терпеливый. Помнит, что важно близким, и тихо делает так, чтобы им было удобно и спокойно. Ценит стабильность, привычные ритуалы и тёплые отношения. Не любит конфликтов и часто ставит чужие нужды выше своих."
+  ],
+  "INFJ": [
+    "Советник",
+    "Глубокий и чуткий, видит скрытые мотивы людей и смысл событий. Мечтает сделать мир лучше и помогает другим раскрыться. Немногословен, но верен своим идеалам. Нуждается в уединении, чтобы восстановить силы."
+  ],
+  "INTJ": [
+    "Стратег",
+    "Самостоятельный, дальновидный, любит выстраивать долгосрочные планы и системы. Быстро видит, как устроена ситуация и что с ней делать. Требователен к себе и к результату, ценит компетентность. Предпочитает работать в одиночку и не любит пустых разговоров."
+  ],
+  "ISTP": [
+    "Мастер",
+    "Спокойный, практичный и наблюдательный. Любит разбираться, как всё устроено, и чинить, собирать, пробовать руками. В кризис сохраняет хладнокровие. Ценит свободу и не терпит лишнего давления и пустых правил."
+  ],
+  "ISFP": [
+    "Художник",
+    "Мягкий, чуткий и искренний. Живёт в согласии со своими чувствами и ценностями, замечает красоту в мелочах. Любит свободу выбора и не навязывает свою позицию другим. Раскрывается через действие и творчество, а не через слова."
+  ],
+  "INFP": [
+    "Мечтатель",
+    "Идеалист с богатым внутренним миром. Ищет смысл и подлинность, остро переживает несправедливость. Любит творчество, идеи и глубокие разговоры один на один. Бывает неорганизованным и откладывает дела, зато очень преданный и добрый."
+  ],
+  "INTP": [
+    "Мыслитель",
+    "Любознательный аналитик, которому важно понять, как всё устроено на самом деле. Любит теории, головоломки и неожиданные связи между идеями. Ценит точность и независимость мышления. Погружается в мысли и может забывать о бытовых делах."
+  ],
+  "ESTP": [
+    "Делатель",
+    "Энергичный и смелый, живёт здесь и сейчас. Быстро оценивает ситуацию и действует, любит риск, движение и азарт. Практичен, находчив и убедителен. Скучает от рутины и долгих рассуждений."
+  ],
+  "ESFP": [
+    "Артист",
+    "Яркий, общительный и жизнерадостный. Умеет наслаждаться моментом и заражает этим других. Любит людей, события, красивые вещи и новые впечатления. Добр и щедр, но не любит строгих планов и скучных обязанностей."
+  ],
+  "ENFP": [
+    "Вдохновитель",
+    "Увлечённый, любознательный и тёплый. Видит повсюду новые возможности и легко заряжает людей идеями. Ценит искренность, свободу и живое общение. Быстро загорается, но ему бывает трудно доводить всё до конца."
+  ],
+  "ENFJ": [
+    "Наставник",
+    "Харизматичный и отзывчивый, чувствует настроение группы и умеет вдохновлять. Любит помогать людям расти и объединять их вокруг общей цели. Ответственный и организованный. Иногда слишком много берёт на себя и забывает о своих нуждах."
+  ],
+  "ENTP": [
+    "Полемист",
+    "Находчивый, остроумный, любит спорить и проверять идеи на прочность. Видит нестандартные решения и легко переключается между темами. Ценит свободу и интеллектуальный азарт. Может терять интерес, когда новизна проходит."
+  ],
+  "ENTJ": [
+    "Командир",
+    "Решительный и волевой лидер. Любит ставить цели, выстраивать план и вести людей к результату. Говорит прямо, ценит эффективность и компетентность. Иногда бывает слишком жёстким и нетерпеливым к тем, кто медлит."
+  ],
+  "ESTJ": [
+    "Администратор",
+    "Организованный, деловой и прямолинейный. Любит порядок, чёткие правила и контроль над процессом. Берёт ответственность и умеет наводить дисциплину. Ценит традиции и справедливость, но может быть излишне категоричным."
+  ],
+  "ESFJ": [
+    "Хозяин",
+    "Тёплый, общительный и заботливый. Создаёт уют, объединяет людей и следит, чтобы всем было хорошо. Ценит гармонию, традиции и признание близких. Тяжело переносит критику и конфликты."
+  ]
+}</script>
+  <script>
+    'use strict';
+
+    const $ = id => document.getElementById(id);
+    const data = JSON.parse($('test-data').textContent);
+    const typeDescriptions = JSON.parse($('type-data').textContent);
+    const functions = Object.keys(data.functionNames);
+    const byFunction = Object.fromEntries(functions.map(code => [code, data.questions.filter(item => item.function === code)]));
+    const total = data.questions.length + data.controlQuestions.length;
+    const percent = (value, digits = 0) => `${value.toFixed(digits).replace('.', ',')}%`;
+
+    function mean(values) {
+      return values.reduce((sum, value) => sum + value, 0) / values.length;
+    }
+
+    // Алгоритмы 2 и 3 из mbti4.php используют нормированные средние по функциям.
+    function functionStrengths(answers) {
+      return Object.fromEntries(functions.map(code => {
+        const values = byFunction[code].map(item => answers[item.id]);
+        return [code, (mean(values) - 1) / 4];
+      }));
+    }
+
+    function myersResult(f) {
+      const sides = {
+        EI: [f.Te + f.Fe + f.Se + f.Ne, f.Ti + f.Fi + f.Si + f.Ni],
+        SN: [f.Se + f.Si, f.Ne + f.Ni],
+        TF: [f.Te + f.Ti, f.Fe + f.Fi],
+        JP: [f.Te + f.Fe, f.Se + f.Ne]
+      };
+      const axes = Object.entries(sides).map(([pair, [a, b]]) => {
+        const sum = a + b;
+        const margin = sum > 0 ? (a - b) / sum * 100 : 0;
+        const share = sum > 0 ? a / sum * 100 : 50;
+        const difference = Math.abs(margin);
+        const clarity = difference < 4 ? 'почти поровну'
+          : difference < 12 ? 'слабая'
+          : difference < 22 ? 'умеренная' : 'ясная';
+        return { pair, share, winner: pair[margin >= 0 ? 0 : 1], clarity };
+      });
+      return { code: axes.map(axis => axis.winner).join(''), axes };
+    }
+
+    function grantRanking(f) {
+      const weights = data.grantWeights;
+      const min = weights.reduce((sum, weight) => sum + Math.min(0, weight), 0);
+      const max = weights.reduce((sum, weight) => sum + Math.max(0, weight), 0);
+      return Object.entries(data.stacks).map(([code, stack]) => {
+        const score = stack.reduce((sum, func, i) => sum + weights[i] * f[func], 0);
+        const share = Math.max(0, Math.min(100, (score - min) / (max - min) * 100));
+        return { code, stack, score, share };
+      }).sort((a, b) => b.score - a.score);
+    }
+
+    function qualityFlags(answers) {
+      const values = data.questions.map(item => answers[item.id]);
+      const average = mean(values);
+      const deviation = Math.sqrt(mean(values.map(value => (value - average) ** 2)));
+      const flags = [];
+      if (deviation < .5) flags.push('Вы почти везде выбирали один и тот же ответ, поэтому результат может быть неточным.');
+      if (average > 4.4 || average < 1.6) flags.push('Почти все ответы оказались у одного края шкалы. Это может снизить точность результата.');
+      if (answers.K3 === 5 && answers.K4 === 5) flags.push('Оба проверочных ответа получили максимальную оценку. Это может указывать на стремление выбирать социально одобряемые ответы.');
+      return flags;
+    }
+
+    function shuffle(items) {
+      const order = items.slice();
+      for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [order[i], order[j]] = [order[j], order[i]];
+      }
+      return order;
+    }
+
+    function buildOrder() {
+      // Та же группировка и взвешенный случайный выбор, что в mbti4.php.
+      for (;;) {
+        const remaining = Object.fromEntries(functions.map(code => [code, shuffle(byFunction[code])]));
+        const order = [];
+        let previous;
+        while (order.length < data.questions.length) {
+          const candidates = functions.filter(code => code !== previous && remaining[code].length > 0);
+          if (!candidates.length) break;
+          const count = candidates.reduce((sum, code) => sum + remaining[code].length, 0);
+          let draw = Math.random() * count;
+          const next = candidates.find(code => (draw -= remaining[code].length) < 0) ?? candidates.at(-1);
+          order.push(remaining[next].pop());
+          previous = next;
+        }
+        if (order.length === data.questions.length) {
+          for (const item of data.controlQuestions) {
+            const index = 6 + Math.floor(Math.random() * (order.length - 8));
+            order.splice(index, 0, item);
+          }
+          return order;
+        }
+      }
+    }
+
+    const views = [$('intro'), $('quiz'), $('results')];
+    const prefersReducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    let order = [];
+    let answers = {};
+    let position = 0;
+    let advanceTimer = null;
+    let resultText = '';
+
+    function show(id, heading) {
+      for (const view of views) view.hidden = view.id !== id;
+      $('demo').hidden = id !== 'intro';
+      $('home').hidden = id === 'intro';
+      document.title = id === 'results' ? 'Результат теста MBTI' : 'Тест личности по MBTI';
+      $(heading).focus({ preventScroll: true });
+      window.scrollTo(0, 0);
+    }
+
+    function goHome() {
+      if (!$('intro').hidden) return;
+      window.clearTimeout(advanceTimer);
+      advanceTimer = null;
+      order = [];
+      answers = {};
+      position = 0;
+      resultText = '';
+      show('intro', 'intro-title');
+    }
+
+    function setProgress() {
+      const answered = Object.keys(answers).length;
+      const progress = $('progress');
+      progress.setAttribute('aria-valuenow', answered);
+      progress.style.setProperty('--value', `${answered / total * 100}%`);
+      $('progress-value').textContent = percent(answered / total * 100);
+    }
+
+    function renderQuestion() {
+      const item = order[position];
+      $('question-count').textContent = `Вопрос ${position + 1} из ${total}`;
+      $('question').textContent = item.question;
+      $('question').setAttribute('aria-label', `${$('question-count').textContent}. ${item.question}`);
+      $('example').textContent = item.example || '';
+      $('example').hidden = !item.example;
+      $('back').disabled = position === 0;
+      for (const option of $('options').children) {
+        option.setAttribute('aria-pressed', Number(option.dataset.value) === answers[item.id]);
+      }
+      setProgress();
+    }
+
+    function focusQuestion() {
+      $('question').focus({ preventScroll: true });
+      if (window.scrollY > $('quiz').offsetTop) window.scrollTo(0, 0);
+    }
+
+    function answer(value) {
+      if (advanceTimer !== null || $('quiz').hidden) return;
+      answers[order[position].id] = value;
+      renderQuestion();
+      advanceTimer = window.setTimeout(() => {
+        advanceTimer = null;
+        if (position === order.length - 1) {
+          showResults();
+        } else {
+          position++;
+          renderQuestion();
+          focusQuestion();
+        }
+      }, prefersReducedMotion.matches ? 0 : 150);
+    }
+
+    function back() {
+      if (advanceTimer !== null || $('quiz').hidden || position === 0) return;
+      position--;
+      renderQuestion();
+      focusQuestion();
+    }
+
+    function start() {
+      order = buildOrder();
+      answers = {};
+      position = 0;
+      renderQuestion();
+      show('quiz', 'question');
+    }
+
+    function bar(value, extraClass = '') {
+      return `<div class="bar ${extraClass}" aria-hidden="true"><span style="--value:${value}%"></span></div>`;
+    }
+
+    function axisDisplay(axis) {
+      const [left, right] = axis.pair;
+      // Округляем перевесившую сторону, чтобы две подписи всегда давали 100%.
+      const leftShare = axis.winner === left ? Math.round(axis.share) : 100 - Math.round(100 - axis.share);
+      return [`${left} ${percent(leftShare)}`, `${right} ${percent(100 - leftShare)}`];
+    }
+
+    function axisRow(axis) {
+      const [left, right] = axisDisplay(axis);
+      const leftWins = axis.winner === axis.pair[0];
+      return `<div>
+        <div class="axis-values">${leftWins ? `<strong>${left}</strong><span>${right}</span>` : `<span>${left}</span><strong>${right}</strong>`}</div>
+        ${bar(axis.share, 'axis-bar')}
+        <p class="axis-note">Уверенность · ${axis.clarity}</p>
+      </div>`;
+    }
+
+    function showResults(demo = false) {
+      const strengths = functionStrengths(answers);
+      const myers = myersResult(strengths);
+      const grant = grantRanking(strengths).slice(0, 3);
+      const rankedFunctions = functions.slice().sort((a, b) => strengths[b] - strengths[a]);
+      const [name, description] = typeDescriptions[myers.code];
+
+      $('demo-note').hidden = !demo;
+      $('type-code').textContent = myers.code;
+      $('type-name').textContent = name;
+      $('type-stack').textContent = data.stacks[myers.code].join(' · ');
+      $('type-description').open = false;
+      $('type-description-text').textContent = description;
+      $('myers-axes').innerHTML = myers.axes.map(axisRow).join('');
+      $('grant-list').innerHTML = grant.map(({ code, stack, share }, index) => `<li class="grant-row">
+        <span class="rank" aria-hidden="true">${index + 1}</span>
+        <div><strong class="grant-type">${code}</strong><span class="stack">${stack.join(' · ')}</span></div>
+        ${bar(share)}<span class="pct">${percent(share, 1)}</span>
+      </li>`).join('');
+      $('function-list').innerHTML = rankedFunctions.map(code => `<li>
+        <div class="function-head">
+          <span><b>${code}</b> ${data.functionNames[code].replace(/ \([^)]*\)$/, '')}</span>
+          <span class="pct">${percent(strengths[code] * 100)}</span>
+        </div>
+        ${bar(strengths[code] * 100)}
+      </li>`).join('');
+
+      const flags = qualityFlags(answers);
+      $('quality').hidden = !flags.length;
+      $('quality-list').innerHTML = flags.map(flag => `<li>${flag}</li>`).join('');
+      $('copy-status').textContent = '';
+      $('copy-fallback').hidden = true;
+      resultText = [
+        demo ? 'Тест MBTI · демо со случайными ответами' : 'Результат теста MBTI',
+        `\nАлгоритм 1 (Sakinorva, Myers) — ${myers.code}`,
+        ...myers.axes.map(axis => axisDisplay(axis).join(' · ')),
+        '\nАлгоритм 1 (Sakinorva, Grant/Brownsword)',
+        ...grant.map(({ code, share }, index) => `${index + 1}. ${code} — ${percent(share, 1)}`),
+        '\nКогнитивные функции',
+        ...rankedFunctions.map(code => `${code} — ${percent(strengths[code] * 100)}`)
+      ].join('\n');
+      show('results', 'result-title');
+    }
+
+    async function copyResult() {
+      const text = resultText;
+      try {
+        await navigator.clipboard.writeText(text);
+        if (resultText !== text) return;
+        $('copy-fallback').hidden = true;
+        $('copy-status').textContent = 'Результат скопирован';
+      } catch {
+        if (resultText !== text) return;
+        const field = $('copy-fallback');
+        field.value = text;
+        field.hidden = false;
+        field.focus();
+        field.select();
+        $('copy-status').textContent = 'Скопируйте выделенный текст';
+      }
+    }
+
+    for (const [value, label] of Object.entries(data.scale)) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'option';
+      button.dataset.value = value;
+      const number = document.createElement('span');
+      number.className = 'option-number';
+      number.textContent = value;
+      const text = document.createElement('span');
+      text.textContent = label;
+      button.append(number, text);
+      button.addEventListener('click', () => answer(Number(value)));
+      $('options').append(button);
+    }
+
+    $('progress').setAttribute('aria-valuemax', total);
+    $('start').addEventListener('click', start);
+    $('back').addEventListener('click', back);
+    for (const id of ['brand', 'home', 'result-home']) $(id).addEventListener('click', goHome);
+    $('copy').addEventListener('click', copyResult);
+    $('demo').addEventListener('click', () => {
+      answers = Object.fromEntries([...data.questions, ...data.controlQuestions]
+        .map(item => [item.id, 1 + Math.floor(Math.random() * 5)]));
+      showResults(true);
+    });
+    document.addEventListener('keydown', event => {
+      if ($('quiz').hidden || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
+      if (/^[1-5]$/.test(event.key)) {
+        event.preventDefault();
+        answer(Number(event.key));
+      } else if (event.key === 'ArrowLeft' || event.key === 'Backspace') {
+        event.preventDefault();
+        back();
+      }
+    });
+  </script>
+</body>
+</html>
